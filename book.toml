@@ -1,0 +1,6 @@
+[book]
+authors = ["Ryan Levick"]
+language = "en"
+multilingual = false
+src = "src"
+title = "WebAssembly Components"

@@ -1,0 +1,6 @@
+(component
+  (component
+    (component)
+  )
+  (component)
+)
