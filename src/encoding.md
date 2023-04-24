@@ -6,7 +6,7 @@ Much like WebAssembly core modules, WebAssembly components are encoded in wasm b
 
 ## Core WebAssembly modules
 
-WebAssembly components are backwards compatible with WebAssembly modules (often called "core modules") and core modules are embedded inside of WebAssembly components. In order to understand components, you must first understand core modules. We won't be providing a detailed explaination of core modules here. However, a good explainer can be [found on MDN](https://developer.mozilla.org/en-US/docs/WebAssembly/Understanding_the_text_format). Give that a read, and come back when you're done.
+WebAssembly components are backwards compatible with WebAssembly modules (often called "core modules") and core modules are embedded inside of WebAssembly components. In order to understand components, you must first understand core modules. We won't be providing a detailed explanation of core modules here. However, a good explainer can be [found on MDN](https://developer.mozilla.org/en-US/docs/WebAssembly/Understanding_the_text_format). Give that a read, and come back when you're done.
 
 ## The simplest component
 
@@ -45,9 +45,9 @@ Which produces the following output:
 
 The binary consists of three parts:
 
-* "00 61 73 6d" is the WebAssembly magic number which tells tooling they're looking at a WebAssembly binary
-* "0c 00" is the binary version. Before the component model is standardized this will keep increasing (to ensure that it's easy to coordinate which pre-standard version the binary is). This will eventually be "01 00" when the standard is finalized.
-* "01 00" is the "layer" which indicates that this is a WebAssembly component (as opposed to a module).
+* `00 61 73 6d` is the WebAssembly magic number which tells tooling we're looking at a WebAssembly binary. It spells "\0asm" in ASCII.
+* `0c 00` is the binary version. Before the component model is standardized this will keep increasing (to ensure that it's easy to coordinate which pre-standard version the binary is). This will eventually be `01 00` when the standard is finalized.
+* `01 00` is the "layer" which indicates that this is a WebAssembly component (as opposed to a core module).
 
 ## Recursive components
 
@@ -90,7 +90,7 @@ This gives us:
 
 Each component (except for the top-level one) has a `(;N;)`. These are there to indicate the *index* of that definition. Definitions that come after a given definition can refer to that definition using its index. 
 
-Indices are not global meaning that for each nested level a new index space starts. This explains why the first two nested components both have index 0. They are the first components at their respective nesting level. These indices are also separted by which *kind* of definition being referred to. We only have component definitions right now, so everything at the same nesting level lives in the same index space, but as we introduce new definition types, definitions will have different index spaces that they occupy depending on what type they are. If this is unclear, wait until the next section when we'll introduce our next definition type: core modules.
+Indices are not global meaning that for each nested level a new index space starts. This explains why the first two nested components both have index 0. They are the first components at their respective nesting level. These indices are also separated by which *kind* of definition being referred to. We only have component definitions right now, so everything at the same nesting level lives in the same index space, but as we introduce new definition types, definitions will have different index spaces that they occupy depending on what type they are. If this is unclear, wait until the next section when we'll introduce our next definition type: core modules.
 
 However, to make reading `wat` files easier, `wasm-tools print` uses block comments (i.e., either between a "(;" and a ";)" which is ignored as a comment) to explicitly show what the index is.
 
@@ -165,15 +165,15 @@ If we turn this wat into a WebAssembly binary and then back into wat, the toolin
 )
 ```
 
-In this equivalent version, we *first* define the function type, then the function definition, and *finally* we export it. Take your time to ensure you are confortable with both equivalent styles and can convince yourself that these two are eqivalent.
+In this equivalent version, we *first* define the function type, then the function definition, and *finally* we export it. Take your time to ensure you are comfortable with both equivalent styles and can convince yourself that these two are equivalent.
 
 It's important to note that there are two top-level definitions that this component has: the nested component which includes the core module *and* another core module that is not nested in a component. Because these definitions are of two different kinds (i.e., component and core module) they occupy two different index spaces and as such both have index 0.
 
 ## Instances
 
-Everything we've defined so far has been immutable dead code. We can also define "instances" which represent components or core modules which have had the imports they define satisified. For example, a core module may import `memory` to use a mutable state needed during its execution. An instance can be used to supply that core module with the memory it requires. Of course, imports can be many other things besides memory including functions.
+Everything we've defined so far has been immutable dead code. We can also define "instances" which represent components or core modules which have had the imports they define satisfied. For example, a core module may import `memory` to use a mutable state needed during its execution. An instance can be used to supply that core module with the memory it requires. Of course, imports can be many other things besides memory including functions.
 
-Instances can allow us to "link" modules and components together with other modules and components by specifying that the imports one component or core module expects are satisifed by the exports of another component or core module.
+Instances can allow us to "link" modules and components together with other modules and components by specifying that the imports one component or core module expects are satisfied by the exports of another component or core module.
 
 Let's take a look at an example (which you can find in `examples/instance/instance.wat`):
 
@@ -202,7 +202,7 @@ The first core instance `$firstInstance` instantiates the `$numbers` core module
 
 ## Renaming with aliases
 
-At times it might be desireable to take an export that has been exported under a certain name and import into another component or core module as a different name. This eliviates the need for exports from one module to exactly match the imports another module is expecting. To accomplish this we'll use "aliases". There are a few kind of aliases so we'll look them in turn.
+At times it might be desireable to take an export that has been exported under a certain name and import into another component or core module as a different name. This eliminates the need for exports from one module to exactly match the imports another module is expecting. To accomplish this we'll use "aliases". There are a few kind of aliases so we'll look them in turn.
 
 ### Out of line aliases
 
@@ -233,7 +233,7 @@ We start much like our previous example by defining two core modules: `$numbers`
 
 After that is where things get interesting. Using an `alias export` we effectively reach into `$firstInstance` and grab the export named "two" and bind that export to the name `$two`. Without this alias function we had no way to refer to that export. Now we can refer to that export as the function `$two` as if it had been defined at the top level (even when in reality it was defined inside a nested core module).
 
-That by itself is not too interesting, but next we instantiate the core module `$doSomething` with an *inline* instance instead of providing `$firstInstance`. This inline instance exports a function called "myNumber" which is defined using the function definition `$two`. Effectively we now have a mechansim for supplying imports to an core module where we decide *at instantiation* which import to provide.
+That by itself is not too interesting, but next we instantiate the core module `$doSomething` with an *inline* instance instead of providing `$firstInstance`. This inline instance exports a function called "myNumber" which is defined using the function definition `$two`. Effectively we now have a mechanism for supplying imports to an core module where we decide *at instantiation* which import to provide.
 
 > Out of line aliases are called such since they are not defined *in-line* with the inline instance. We'll see another type of alias that allows declaring aliases inline inside of inline instance definitions.
 
@@ -242,7 +242,7 @@ This allows us to instantiate `$doSomething` many times where we supply the impo
 There is also a second syntax for declaring an out of line alias:
 
 ```wat
-;; This is eqivalent to `(core func $two (alias core export $firstInstance "two"))`
+;; This is equivalent to `(core func $two (alias core export $firstInstance "two"))`
 (alias core export $firstInstance "two" (core func $two))
 ```
 
@@ -270,7 +270,7 @@ Instead of first declaring an alias any then using that alias within an inline i
 )
 ```
 
-You'll notice that we are no longer first delcaring an alias before instantiating `$secondInstance`. Instead we delcare the alias in the same line as declaring the export of our inline instance with `(func $firstInstance "two")`. Just like before, this reaches into `$firstInstance` and brings the "two" function into scope for our use.
+You'll notice that we are no longer first declaring an alias before instantiating `$secondInstance`. Instead we declare the alias in the same line as declaring the export of our inline instance with `(func $firstInstance "two")`. Just like before, this reaches into `$firstInstance` and brings the "two" function into scope for our use.
 
 > *Note*: We're only showing linking of *core modules*, because we need to introduce component-level type and function definitions before we can do that.
 
