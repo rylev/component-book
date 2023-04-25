@@ -27,7 +27,7 @@ wasm-tools validate examples/simple/simple.wat -f component-model
 We can produce the `.wasm` binary equivalent of this component using `wasm-tools parse`:
 
 ```bash
-wasm-tools parse examples/simple/simple.wat -o simple.was
+wasm-tools parse examples/simple/simple.wat -o simple.wasm
 ```
 
 While we can inspect this binary directly, we can also use another tool `wasm-tools dump` to view the binary format with helpful annotations on the side.
