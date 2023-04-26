@@ -46,7 +46,7 @@ Which produces the following output:
 The binary consists of three parts:
 
 * `00 61 73 6d` is the WebAssembly magic number which tells tooling we're looking at a WebAssembly binary. It spells "\0asm" in ASCII.
-* `0c 00` is the binary version. Before the component model is standardized this will keep increasing (to ensure that it's easy to coordinate which pre-standard version the binary is). This will eventually be `01 00` when the standard is finalized.
+* `0c 00` is the binary version. Before the component model is standardized this will keep increasing (to ensure that it's easy to coordinate which pre-standard version the binary is). This [will eventually be `01 00`](https://github.com/WebAssembly/component-model/blob/79c0614c55b06896af3349f5dadf644fb077922b/design/mvp/Binary.md?plain=1#L45) when the standard is finalized.
 * `01 00` is the "layer" which indicates that this is a WebAssembly component (as opposed to a core module).
 
 ## Recursive components
@@ -73,7 +73,7 @@ It's important to note that components definitions are acyclic: definitions can 
 We notice something interesting when we parse our recursive example into a WebAssembly binary and then print it *back* out as wat:
 
 ```bash
-wasm-tools parse examples/recursive/recursive.wat -o recursive.wasm` 
+wasm-tools parse examples/recursive/recursive.wat -o recursive.wasm`
 wasm-tools print recursive.wasm`
 ```
 
@@ -88,7 +88,7 @@ This gives us:
 )
 ```
 
-Each component (except for the top-level one) has a `(;N;)`. These are there to indicate the *index* of that definition. Definitions that come after a given definition can refer to that definition using its index. 
+Each component (except for the top-level one) has a `(;N;)`. These are there to indicate the *index* of that definition. Definitions that come after a given definition can refer to that definition using its index.
 
 Indices are not global meaning that for each nested level a new index space starts. This explains why the first two nested components both have index 0. They are the first components at their respective nesting level. These indices are also separated by which *kind* of definition being referred to. We only have component definitions right now, so everything at the same nesting level lives in the same index space, but as we introduce new definition types, definitions will have different index spaces that they occupy depending on what type they are. If this is unclear, wait until the next section when we'll introduce our next definition type: core modules.
 
@@ -137,7 +137,7 @@ Besides recursively containing components, components can also contain core WebA
 )
 ```
 
-The wat above uses the short hand way of defining a core function type, the function definition, *and* exporting that function all at the same type. 
+The wat above uses the short hand way of defining a core function type, the function definition, *and* exporting that function all at the same type.
 
 If we turn this wat into a WebAssembly binary and then back into wat, the tooling will use the more verbose syntax:
 
@@ -196,7 +196,7 @@ This component consists of 4 definitions:
 * Two core modules
 * Two core instances
 
-The first core module `$numbers` exports a function called "one". The second core module `$doSomething` wants to import a function called "one" in the namespace "myNamespace". 
+The first core module `$numbers` exports a function called "one". The second core module `$doSomething` wants to import a function called "one" in the namespace "myNamespace".
 
 The first core instance `$firstInstance` instantiates the `$numbers` core module. Since the `$numbers` core module expects no imports, we do not need to supply any. The second core instance `$secondInstance` instantiates the core module `$doSomething` with an instance that we're supplying under the namespace "myNamespace"). Since `$doSomething` is expecting an imported namespace "myNamespace" which contains a function named "one" and we're supplying `$firstInstance` under the namespace "myNamespace" and $firstInstance exports a function named "one", everything lines up and we form a valid component.
 
