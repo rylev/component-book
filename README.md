@@ -2,7 +2,7 @@
 
 A high-level explanation of the low-level details of WebAssembly components
 
-You can find a deployed version of this book [here](https://wasm-components.netlify.app).
+You can find a deployed version of this book [here](https://wasm-components.fermyon.app/).
 
 ## Building
 
